@@ -1,0 +1,6 @@
+@reference "../../app/globals.css";
+
+.button {
+  @apply w-full bg-primary text-dark font-semibold rounded-lg py-2 text-sm
+         hover:opacity-90 transition-opacity cursor-pointer;
+}

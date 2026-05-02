@@ -1,0 +1,17 @@
+@reference "../../app/globals.css";
+
+.formCard {
+  @apply bg-lighter rounded-xl p-8 w-full max-w-sm mx-auto flex flex-col gap-6;
+}
+
+.form {
+  @apply flex flex-col gap-4;
+}
+
+.switchLink {
+  @apply text-center text-sm text-body;
+}
+
+.switchLink a {
+  @apply text-primary hover:underline;
+}

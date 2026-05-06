@@ -15,3 +15,7 @@
 .switchLink a {
   @apply text-primary hover:underline;
 }
+
+.error {
+  @apply text-error text-sm;
+}

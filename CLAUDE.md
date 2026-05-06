@@ -15,7 +15,7 @@ npm test         # Run all tests with Vitest (watch mode)
 To run a single test file:
 
 ```bash
-npx vitest run tests/components/Navbar.test.tsx
+npx vitest run tests/components/Button.test.tsx
 ```
 
 ## Architecture
@@ -46,9 +46,27 @@ Components use CSS Modules alongside Tailwind. Module files must include a `@ref
 
 Components live in `components/<Name>/` with a barrel `index.ts` for clean imports. New components should follow this pattern.
 
+Current primitive components (reuse these before creating new ones):
+
+- `Button` — accepts all native button props; styled full-width primary by default
+- `Input` — renders a label + input pair; requires `id` and `label` props
+- `PasswordInput` — label + password field with built-in show/hide toggle (`'use client'`)
+- `Avatar` — displays name initials; two uppercase letters for PascalCase names
+
+Form components compose the primitives above:
+
+- `LoginForm` / `SignupForm` — own email/password state; log to console on submit (`'use client'`)
+
+### Client Components
+
+Any component using React hooks (`useState`, etc.) must have `'use client'` at the top. This applies even when the component is used inside another client component.
+
 ### Testing
 
-Vitest + React Testing Library with jsdom. Tests live in `tests/` mirroring the source structure. Global test APIs (`describe`, `it`, `expect`) are available without imports. `vitest.setup.ts` imports `@testing-library/jest-dom` matchers, so DOM assertions like `toBeInTheDocument()` are available globally.
+Vitest + React Testing Library with jsdom. Tests live in `tests/` mirroring the source structure. Global test APIs (`describe`, `it`, `expect`, `vi`) are available without imports. `vitest.setup.ts` imports `@testing-library/jest-dom` matchers, so DOM assertions like `toBeInTheDocument()` are available globally.
+
+- Use `getByLabelText('Password')` (exact string) rather than `/password/i` (regex) when a password toggle button is also present — the regex matches both the input label and the button's `aria-label`.
+- Use `userEvent.setup()` from `@testing-library/user-event` v14 for interaction tests.
 
 ### Path Alias
 

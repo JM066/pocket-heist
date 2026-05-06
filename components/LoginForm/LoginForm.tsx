@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 import Input from '@/components/Input'
 import PasswordInput from '@/components/PasswordInput'
 import Button from '@/components/Button'
@@ -10,10 +12,16 @@ import styles from './LoginForm.module.css'
 export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    console.log({ email, password })
+    setError('')
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Login failed')
+    }
   }
 
   return (
@@ -35,6 +43,7 @@ export default function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
         />
+        {error && <p className={styles.error}>{error}</p>}
         <Button type="submit">Log In</Button>
       </form>
       <p className={styles.switchLink}>

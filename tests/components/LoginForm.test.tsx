@@ -2,6 +2,15 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import LoginForm from "@/components/LoginForm"
 
+const mockSignIn = vi.fn()
+
+vi.mock('@/lib/firebase', () => ({ auth: {} }))
+vi.mock('firebase/auth', () => ({
+  signInWithEmailAndPassword: (...args: unknown[]) => mockSignIn(...args),
+}))
+
+beforeEach(() => mockSignIn.mockResolvedValue({}))
+
 describe("LoginForm", () => {
   it("renders the heading", () => {
     render(<LoginForm />)
@@ -25,14 +34,12 @@ describe("LoginForm", () => {
     expect(link).toHaveAttribute("href", "/signup")
   })
 
-  it("logs email and password to console on submit", async () => {
-    const spy = vi.spyOn(console, "log").mockImplementation(() => {})
+  it("calls signInWithEmailAndPassword with email and password on submit", async () => {
     const user = userEvent.setup()
     render(<LoginForm />)
     await user.type(screen.getByLabelText("Email"), "test@example.com")
     await user.type(screen.getByLabelText("Password"), "secret123")
     await user.click(screen.getByRole("button", { name: /log in/i }))
-    expect(spy).toHaveBeenCalledWith({ email: "test@example.com", password: "secret123" })
-    spy.mockRestore()
+    expect(mockSignIn).toHaveBeenCalledWith({}, "test@example.com", "secret123")
   })
 })

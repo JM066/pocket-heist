@@ -2,6 +2,15 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import SignupForm from "@/components/SignupForm"
 
+const mockCreateUser = vi.fn()
+
+vi.mock('@/lib/firebase', () => ({ auth: {} }))
+vi.mock('firebase/auth', () => ({
+  createUserWithEmailAndPassword: (...args: unknown[]) => mockCreateUser(...args),
+}))
+
+beforeEach(() => mockCreateUser.mockResolvedValue({}))
+
 describe("SignupForm", () => {
   it("renders the heading", () => {
     render(<SignupForm />)
@@ -25,14 +34,12 @@ describe("SignupForm", () => {
     expect(link).toHaveAttribute("href", "/login")
   })
 
-  it("logs email and password to console on submit", async () => {
-    const spy = vi.spyOn(console, "log").mockImplementation(() => {})
+  it("calls createUserWithEmailAndPassword with email and password on submit", async () => {
     const user = userEvent.setup()
     render(<SignupForm />)
     await user.type(screen.getByLabelText("Email"), "new@example.com")
     await user.type(screen.getByLabelText("Password"), "newpass456")
     await user.click(screen.getByRole("button", { name: /sign up/i }))
-    expect(spy).toHaveBeenCalledWith({ email: "new@example.com", password: "newpass456" })
-    spy.mockRestore()
+    expect(mockCreateUser).toHaveBeenCalledWith({}, "new@example.com", "newpass456")
   })
 })
